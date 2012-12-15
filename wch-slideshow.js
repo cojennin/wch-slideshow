@@ -20,7 +20,6 @@ $(function(){
 		model: wchsSingleSlide,
 	});
 
-
 	//Create slideshow wrapper. This view
 	//will wrap most of the functionality of the slideshow as well
 	//as fill in the handlbar markup correctly
@@ -30,6 +29,7 @@ $(function(){
 		id:"wchs-picture-container",
 		wchs_index: 0,
 		appended_nav: false,
+		total_width = 0,
 
 		//Need to parse through the handlebar content
 		initialize: function(options){
@@ -37,7 +37,6 @@ $(function(){
 			this.wchs_width = options.w;
 			this.wchs_height = options.h;
 			this.wchs_slides = options.collection;
-			this.total_width = 0;
 
 			//Wrap the template container object in jQuery, use later
 			//on in parsing handlebar data
@@ -137,20 +136,12 @@ $(function(){
 			this.parent = options.parent_view;
 		},
 
-		/*events: {
-			"click": "slideSelected"
-		},*/
-
 		render: function(){
 			var slide_html = '<img src="'+this.model.get("img")+'" style="height:'+this.parent.wchs_height+'" />';
 			$(this.el).css('left', (this.shift_by*this.parent.wchs_width)*-1)
 			$(this.el).append(slide_html);
 			return this;
 		},
-
-		/*slideSelected: function(){
-			alert("test");
-		}*/	
 
 	});
 
