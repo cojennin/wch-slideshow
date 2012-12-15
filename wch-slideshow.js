@@ -86,7 +86,6 @@ $(function(){
 			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV", parent_view:this }).render().el;
 			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT", parent_view:this}).render().el;
 			if(this.appended_nav == false){
-				console.log("Test");
 				$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
 				this.appended_nav = true;
 			}
@@ -163,7 +162,6 @@ $(function(){
 		},
 
 		render: function(){
-			//console.log(this.next_prev);
 			(this.$el).html('<div id="'+this.id+'-inside" class="wchs-inside-nav"></div><div id="'+this.next_prev.toLowerCase()+'-text" class="nav-font-color">'+this.next_prev+'</div>');
 			return this;
 		},
