@@ -58,7 +58,7 @@ $(function(){
 			//Figure out how to bind single slide backbone models to 
 			//handlebar registerHelper funccollectiotions. 
 			//Calling this in underscore references underscores this
-			this.$el.html("");
+			this.$el.empty();
 			var container_this = this;
 			Handlebars.registerHelper('each', function(context, options){
 				_.each(context, function(single_slide, i){
@@ -85,7 +85,12 @@ $(function(){
 			//Run the template to generate single slides
 			//given handlebar markup
 			this.template(this.wchs_slides);
+			//Need to render two navigation menus
+			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV"}).render().el;
+			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT"}).render().el;
 			$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
+			$('#wchs-slideshow-wrapper').append(($(leftNav)))
+			$('#wchs-slideshow-wrapper').append(($(rightNav)));
 			//Need to explicity call delegateEvents or events won't rebind because appending
 			//html to wrapper, not explicity inserting into already created container
 			this.delegateEvents();
@@ -138,21 +143,36 @@ $(function(){
 
 	var wchsSlideNavView = Backbone.View.extend({
 
-		clasName: 'wchs-slide-nav',
+		className: 'wchs-slide-nav',
 
 		intialize: function(options){
 			//Designate left or right arrow
 			this.id = options.id;
+			this.next_prev = options.next_prev;
 		},
 
 		events: {
-			"hover": "showSlide",
-			"click": "moveOneSlide"
+			"mouseover": "showNavBar",
+			"mouseout" : "hideNavBar"
 		},
 
 		render: function(){
+			(this.$el).text(this.next_prev);
 			return this;
+		},
+
+		showNavBar: function(){
+			if(!$(this).hasClass('animated')){
+				this.$el.dequeue().stop().animate({ opacity: .8 }, 400);
+			}
+		},
+
+		hideNavBar: function(){
+			this.$el.addClass('animated').animate({ opacity: 0 }, 400, function(){
+				$(this).removeClass('animated').dequeue();
+			});
 		}
+
 	});
 
 	//The object being passed will be processed by handlebars
