@@ -29,7 +29,7 @@ $(function(){
 		id:"wchs-picture-container",
 		wchs_index: 0,
 		appended_nav: false,
-		total_width = 0,
+		total_width: 0,
 
 		//Need to parse through the handlebar content
 		initialize: function(options){
