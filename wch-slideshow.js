@@ -29,6 +29,7 @@ $(function(){
 		//Wrapper id
 		id:"wchs-picture-container",
 		wchs_index: 0,
+		appended_nav: false,
 
 		//Need to parse through the handlebar content
 		initialize: function(options){
@@ -46,10 +47,6 @@ $(function(){
 			//this.on("change", this.render(), this.wchs_slides);
 			//Begin rendering slideshow container
 			this.render();
-		},
-
-		events: {
-			"click": "rotateSlideForwardByOne"
 		},
 
 		template: function(context){
@@ -85,12 +82,21 @@ $(function(){
 			//Run the template to generate single slides
 			//given handlebar markup
 			this.template(this.wchs_slides);
-			//Need to render two navigation menus
-			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV"}).render().el;
-			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT"}).render().el;
-			$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
-			$('#wchs-slideshow-wrapper').append(($(leftNav)))
+			var container_this = this;
+
+			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV", parent_view:this }).render().el;
+			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT", parent_view:this}).render().el;
+			if(this.appended_nav == false){
+				console.log("Test");
+				$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
+				this.appended_nav = true;
+			}
+			//This seems hacky. Should move the 
+			//appendage of these elements into the respective views.
+			//Would get disturbed less.
+			$('#wchs-slideshow-wrapper').append($(leftNav))
 			$('#wchs-slideshow-wrapper').append(($(rightNav)));
+			this.appended_nav = true;
 			//Need to explicity call delegateEvents or events won't rebind because appending
 			//html to wrapper, not explicity inserting into already created container
 			this.delegateEvents();
@@ -105,6 +111,13 @@ $(function(){
 				this.render();
 			}
 		},
+
+		rotateSlideBackwardByOne: function(){
+			if(this.wchs_index != 0){
+				this.wchs_index--;
+				this.render();
+			}
+		}
 
 	});
 
@@ -129,7 +142,7 @@ $(function(){
 		},*/
 
 		render: function(){
-			var slide_html = "<img src='"+this.model.get("img")+"' />";
+			var slide_html = '<img src="'+this.model.get("img")+'" style="height:'+this.parent.wchs_height+'" />';
 			$(this.el).css('left', (this.shift_by*this.parent.wchs_width)*-1)
 			$(this.el).append(slide_html);
 			return this;
@@ -145,32 +158,48 @@ $(function(){
 
 		className: 'wchs-slide-nav',
 
-		intialize: function(options){
+		initialize: function(options){
 			//Designate left or right arrow
 			this.id = options.id;
 			this.next_prev = options.next_prev;
+			this.parent = options.parent_view;
 		},
 
 		events: {
 			"mouseover": "showNavBar",
-			"mouseout" : "hideNavBar"
+			"mouseout" : "hideNavBar",
+			"click": "moveSlideOne"
 		},
 
 		render: function(){
-			(this.$el).text(this.next_prev);
+			//console.log(this.next_prev);
+			(this.$el).html('<div id="'+this.id+'-inside" class="wchs-inside-nav"></div><div id="'+this.next_prev.toLowerCase()+'-text" class="nav-font-color">'+this.next_prev+'</div>');
 			return this;
 		},
 
 		showNavBar: function(){
 			if(!$(this).hasClass('animated')){
-				this.$el.dequeue().stop().animate({ opacity: .8 }, 400);
+				$('#'+this.id+'-inside').dequeue().stop().animate({ opacity: .8 }, 300);
+				$('#'+this.next_prev.toLowerCase()+'-text').dequeue().stop().animate({ opacity: 1 }, 300);
 			}
 		},
 
 		hideNavBar: function(){
-			this.$el.addClass('animated').animate({ opacity: 0 }, 400, function(){
+			$('#'+this.next_prev.toLowerCase()+'-text').addClass('animated').animate({ opacity: 0 }, 250, function(){
 				$(this).removeClass('animated').dequeue();
 			});
+			$('#'+this.id+'-inside').addClass('animated').animate({ opacity: 0 }, 250, function(){
+				$('#'+this.id+'-inside').removeClass('animated').dequeue();
+			});
+		},
+
+		moveSlideOne: function(){
+			if(this.id == "right-nav"){
+				this.parent.rotateSlideForwardByOne();
+			}
+			if(this.id == "left-nav"){
+				this.parent.rotateSlideBackwardByOne();
+			}
 		}
 
 	});
@@ -181,7 +210,8 @@ $(function(){
 	var wchsSlides = new wchsSlideCollection([
 			{id: 1, img: "./imgs/temp_src_material/img_1.jpg", byline: "Connor J", caption: "Test caption"},
 			{id: 2, img: "./imgs/temp_src_material/img_2.jpg", byline: "Not Connor J", caption: "Not a test caption"},
-			{id: 3, img: "./imgs/temp_src_material/img_3.jpg", byline: "A Connor J", caption: "A test caption"}
+			{id: 3, img: "./imgs/temp_src_material/img_3.jpg", byline: "A Connor J", caption: "A test caption"},
+			{id: 4, img: "./imgs/temp_src_material/img_4.jpg", byline: "A Connor J", caption: "A test caption"}
 		]
 	);
 
