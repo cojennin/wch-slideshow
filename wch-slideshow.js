@@ -1,5 +1,11 @@
 $(function(){
-	
+
+	//Global notifier
+	var global_notifier = {};
+
+	_.extend(global_notifier, Backbone.Events);
+
+
 	//Model for a single slide
 	//Contains the information about the slide:
 	//byline, caption, img src
@@ -84,11 +90,8 @@ $(function(){
 			this.template(this.wchs_slides);
 			var container_this = this;
 
-			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV", parent_view:this }).render().el;
-			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT", parent_view:this}).render().el;
-			var playButton = new wchsControlButton({control: "play", parent_view:this}).render().el;
-
 			if(this.appended_content == false){
+				var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV", parent_view:this }).render().el;
 				$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
 				this.appended_content = true;
 			}
@@ -96,6 +99,8 @@ $(function(){
 			//appendage of these elements into the respective views.
 			//Would get disturbed less.
 			if(!this.appended_nav){
+				var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT", parent_view:this}).render().el;
+				var playButton = new wchsControlButton({control: "play", parent_view:this}).render().el;
 				$('#wchs-slideshow-wrapper').append($(leftNav))
 				$('#wchs-slideshow-wrapper').append(($(rightNav)));
 				$('#wchs-slideshow-wrapper').append($(playButton));
@@ -203,6 +208,7 @@ $(function(){
 			if(this.id == "left-nav"){
 				this.parent.rotateSlideBackwardByOne();
 			}
+			global_notifier.trigger("wchsStopSlide");
 		}
 
 	});
@@ -214,6 +220,9 @@ $(function(){
 		initialize: function(options){
 			this.control = options.control;
 			this.parent = options.parent_view;
+			global_notifier.on("wchsStopSlide", this.stopSlideshow, this);
+			//Global notifier should listen for navigation button click
+			//and stop slideshow accordingly
 		},
 
 		events: {
@@ -228,16 +237,29 @@ $(function(){
 		},
 
 		controlAction: function(){
+			var outside_view = this;
 			if($('#control-img').hasClass('play-img')){
 				$('#control-img').removeClass('play-img').addClass('stop-img').attr('src', './imgs/stop.png');
 				//Set an interval for moving slides
 				var control_view_this = this;
-				this.timer = setInterval(function(){
+				outside_view.timer = setInterval(function(){
 						control_view_this.parent.rotateSlideForwardByOne()
 					}, 4000);
 			} else{
 				$('#control-img').removeClass('stop-img').addClass('play-img').attr('src', './imgs/play.png');
+				this.stopSlideshow();
 				clearInterval(this.timer);
+			}
+		},
+
+		stopSlideshow: function(){
+			if($('#control-img').hasClass('stop-img')){
+				$('#control-img').removeClass('stop-img').addClass('play-img').attr('src', './imgs/play.png');
+				try{
+					clearInterval(this.timer);
+				} catch(err){
+					//timer doesn't exist yet, we're cool with that
+				}
 			}
 		},
 
