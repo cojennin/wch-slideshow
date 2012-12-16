@@ -8,7 +8,7 @@ $(function(){
 			id: null,
 			img: null,
 			byline: null,
-			caption: null,	
+			caption: null
 		}
 	});
 
@@ -17,7 +17,7 @@ $(function(){
 	//amt of slides. Should notify the navigation view when
 	//it has been updated
 	var wchsSlideCollection = Backbone.Collection.extend({
-		model: wchsSingleSlide,
+		model: wchsSingleSlide
 	});
 
 	//Create slideshow wrapper. This view
@@ -29,6 +29,7 @@ $(function(){
 		id:"wchs-picture-container",
 		wchs_index: 0,
 		appended_nav: false,
+		appended_content: false,
 		total_width: 0,
 
 		//Need to parse through the handlebar content
@@ -85,16 +86,21 @@ $(function(){
 
 			var leftNav = new wchsSlideNavView({id: "left-nav", next_prev:"PREV", parent_view:this }).render().el;
 			var rightNav = new wchsSlideNavView({id: "right-nav", next_prev:"NEXT", parent_view:this}).render().el;
-			if(this.appended_nav == false){
+			var playButton = new wchsControlButton({control: "play", parent_view:this}).render().el;
+
+			if(this.appended_content == false){
 				$('#wchs-slideshow-wrapper').html((this.$el).height(this.wchs_height).width(this.total_width));
-				this.appended_nav = true;
+				this.appended_content = true;
 			}
 			//This seems hacky. Should move the 
 			//appendage of these elements into the respective views.
 			//Would get disturbed less.
-			$('#wchs-slideshow-wrapper').append($(leftNav))
-			$('#wchs-slideshow-wrapper').append(($(rightNav)));
-			this.appended_nav = true;
+			if(!this.appended_nav){
+				$('#wchs-slideshow-wrapper').append($(leftNav))
+				$('#wchs-slideshow-wrapper').append(($(rightNav)));
+				$('#wchs-slideshow-wrapper').append($(playButton));
+				this.appended_nav = true;
+			}
 			//Need to explicity call delegateEvents or events won't rebind because appending
 			//html to wrapper, not explicity inserting into already created container
 			this.delegateEvents();
@@ -108,11 +114,19 @@ $(function(){
 				this.wchs_index++;
 				this.render();
 			}
+			else if(this.wchs_index == this.wchs_slides.length-1){
+				this.wchs_index = 0;
+				this.render();
+			}
 		},
 
 		rotateSlideBackwardByOne: function(){
 			if(this.wchs_index != 0){
 				this.wchs_index--;
+				this.render();
+			}
+			else if(this.wchs_index == 0){
+				this.wchs_index = this.wchs_slides.length-1;
 				this.render();
 			}
 		}
@@ -192,6 +206,57 @@ $(function(){
 		}
 
 	});
+
+	var wchsControlButton = Backbone.View.extend({
+		className: "control-button",
+		timer: null,
+
+		initialize: function(options){
+			this.control = options.control;
+			this.parent = options.parent_view;
+		},
+
+		events: {
+			"click" : "controlAction",
+			"mouseover" : "showControl",
+			"mouseout" : "hideControl"
+		},
+
+		render: function(){
+			(this.$el).html('<div id="control-box"></div><img id="control-img" class="'+this.control+'-img" src="./imgs/'+this.control+'.png" />');
+			return this;
+		},
+
+		controlAction: function(){
+			if($('#control-img').hasClass('play-img')){
+				$('#control-img').removeClass('play-img').addClass('stop-img').attr('src', './imgs/stop.png');
+				//Set an interval for moving slides
+				var control_view_this = this;
+				this.timer = setInterval(function(){
+						control_view_this.parent.rotateSlideForwardByOne()
+					}, 4000);
+			} else{
+				$('#control-img').removeClass('stop-img').addClass('play-img').attr('src', './imgs/play.png');
+				clearInterval(this.timer);
+			}
+		},
+
+		showControl: function(){
+			if(!$(this).hasClass('animated')){
+				$('#control-box').dequeue().stop().animate({ opacity: .8 }, 250);
+				$('#control-img').dequeue().stop().animate({ opacity: 1 }, 250);
+			}
+		},
+
+		hideControl: function(){
+			$('#control-box').addClass('animated').animate({ opacity: .1 }, 200, function(){
+				$(this).removeClass('animated').dequeue();
+			});
+			$('#control-img').addClass('animated').animate({ opacity: .2 }, 200, function(){
+				$('#control-img').removeClass('animated').dequeue();
+			});
+		}
+	})
 
 	//The object being passed will be processed by handlebars
 	//When looping through on the each statement, new singleSlide models will

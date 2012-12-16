@@ -1,11 +1,15 @@
-#wchs-slideshow-wrapper {position:relative;overflow:hidden;width:600px;height:400px;}
-#wchs-picture-container .wchs-single-slide-standard {height:400px;width:600px;overflow:hidden;float:left;position:relative;}
+#wchs-slideshow-wrapper{position:relative;overflow:hidden;width:600px;height:400px;}
+#wchs-picture-container .wchs-single-slide-standard{height:400px;width:600px;overflow:hidden;float:left;position:relative;}
 #wchs-picture-container .wchs-single-slide-standard img{display:block;margin:0 auto;}
 
-#wchs-slideshow-wrapper #left-nav {position:absolute;width:100px;height:160px;top:50%;margin-top:-80px;}
-#wchs-slideshow-wrapper #left-nav #prev-text {position:absolute;top:64px;left:10px;}
-#wchs-slideshow-wrapper #right-nav {position:absolute;width:100px;height:160px;top:50%;margin-top:-80px;right:0px;}
-#wchs-slideshow-wrapper #right-nav #next-text {position: absolute;top: 64px;left: 14px;}
-#wchs-slideshow-wrapper .nav-font-color{filter: alpha(opacity=0);opacity: 0.0;cursor:pointer;color: white;font-size: 28px;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
+#wchs-slideshow-wrapper #left-nav{position:absolute;width:100px;height:160px;top:50%;margin-top:-80px;}
+#wchs-slideshow-wrapper #left-nav #prev-text{position:absolute;top:64px;left:10px;}
+#wchs-slideshow-wrapper #right-nav{position:absolute;width:100px;height:160px;top:50%;margin-top:-80px;right:0px;}
+#wchs-slideshow-wrapper #right-nav #next-text{position:absolute;top:64px;left:14px;}
+#wchs-slideshow-wrapper .nav-font-color{filter:alpha(opacity=0);opacity: 0.0;cursor:pointer;color:white;font-size: 28px;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
+#wchs-slideshow-wrapper .wchs-inside-nav {background-color:#111;zoom:1;filter:alpha(opacity=0);opacity:0.0;cursor:pointer;width:100px;height:160px;}
 
-#wchs-slideshow-wrapper .wchs-inside-nav {background-color:#111;zoom: 1;filter: alpha(opacity=0);opacity: 0.0;cursor:pointer;width:100px;height:160px;}
+#wchs-slideshow-wrapper .control-button{cursor:pointer;position:absolute;bottom:0px;left:0px;width:60px;height:60px;}
+#wchs-slideshow-wrapper .control-button #control-box{background-color:#111;width:60px;height:60px;opacity:0.1;zoom:1;filter:alpha(opacity=1);}
+#wchs-slideshow-wrapper .control-button .play-img {position:absolute;left:15px;top:10px;z-index:10;opacity:0.2;zoom:1;filter:alpha(opacity=2);}
+#wchs-slideshow-wrapper .control-button .stop-img {position:absolute;left:12px;top:10px;z-index:10;opacity:0.2;zoom:1;filter:alpha(opacity=2);}
